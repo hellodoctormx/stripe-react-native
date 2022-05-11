@@ -287,27 +287,27 @@ PODS:
   - RNScreens (3.10.2):
     - React-Core
     - React-RCTImage
-  - Stripe (22.3.0):
-    - Stripe/Stripe3DS2 (= 22.3.0)
-    - StripeApplePay (= 22.3.0)
-    - StripeCore (= 22.3.0)
-    - StripeUICore (= 22.3.0)
-  - stripe-react-native (0.8.0):
+  - Stripe (22.2.0):
+    - Stripe/Stripe3DS2 (= 22.2.0)
+    - StripeApplePay (= 22.2.0)
+    - StripeCore (= 22.2.0)
+    - StripeUICore (= 22.2.0)
+  - stripe-react-native (0.9.0):
     - React-Core
-    - Stripe (~> 22.3.0)
-    - StripeFinancialConnections (~> 22.3.0)
-  - Stripe/Stripe3DS2 (22.3.0):
-    - StripeApplePay (= 22.3.0)
-    - StripeCore (= 22.3.0)
-    - StripeUICore (= 22.3.0)
-  - StripeApplePay (22.3.0):
-    - StripeCore (= 22.3.0)
-  - StripeCore (22.3.0)
-  - StripeFinancialConnections (22.3.0):
-    - StripeCore (= 22.3.0)
-    - StripeUICore (= 22.3.0)
-  - StripeUICore (22.3.0):
-    - StripeCore (= 22.3.0)
+    - Stripe
+    - StripeFinancialConnections
+  - Stripe/Stripe3DS2 (22.2.0):
+    - StripeApplePay (= 22.2.0)
+    - StripeCore (= 22.2.0)
+    - StripeUICore (= 22.2.0)
+  - StripeApplePay (22.2.0):
+    - StripeCore (= 22.2.0)
+  - StripeCore (22.2.0)
+  - StripeFinancialConnections (22.2.0):
+    - StripeCore (= 22.2.0)
+    - StripeUICore (= 22.2.0)
+  - StripeUICore (22.2.0):
+    - StripeCore (= 22.2.0)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -347,17 +347,17 @@ DEPENDENCIES:
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - RNScreens (from `../node_modules/react-native-screens`)
+  - Stripe (from `https://github.com/stripe-ios/stripe-ios.git`, branch `payment_sheet_appearance_beta_1`)
   - stripe-react-native (from `../..`)
+  - StripeCore (from `https://github.com/stripe-ios/stripe-ios.git`, branch `payment_sheet_appearance_beta_1`)
+  - StripeFinancialConnections (from `https://github.com/stripe-ios/stripe-ios.git`, branch `payment_sheet_appearance_beta_1`)
+  - StripeUICore (from `https://github.com/stripe-ios/stripe-ios.git`, branch `payment_sheet_appearance_beta_1`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
     - fmt
-    - Stripe
     - StripeApplePay
-    - StripeCore
-    - StripeFinancialConnections
-    - StripeUICore
 
 EXTERNAL SOURCES:
   boost:
@@ -428,10 +428,36 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-picker/picker"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  Stripe:
+    :branch: payment_sheet_appearance_beta_1
+    :git: https://github.com/stripe-ios/stripe-ios.git
   stripe-react-native:
     :path: "../.."
+  StripeCore:
+    :branch: payment_sheet_appearance_beta_1
+    :git: https://github.com/stripe-ios/stripe-ios.git
+  StripeFinancialConnections:
+    :branch: payment_sheet_appearance_beta_1
+    :git: https://github.com/stripe-ios/stripe-ios.git
+  StripeUICore:
+    :branch: payment_sheet_appearance_beta_1
+    :git: https://github.com/stripe-ios/stripe-ios.git
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
+
+CHECKOUT OPTIONS:
+  Stripe:
+    :commit: 54b78a22d7d30558f304176e16e4d08be3cdcc57
+    :git: https://github.com/stripe-ios/stripe-ios.git
+  StripeCore:
+    :commit: 54b78a22d7d30558f304176e16e4d08be3cdcc57
+    :git: https://github.com/stripe-ios/stripe-ios.git
+  StripeFinancialConnections:
+    :commit: 54b78a22d7d30558f304176e16e4d08be3cdcc57
+    :git: https://github.com/stripe-ios/stripe-ios.git
+  StripeUICore:
+    :commit: 54b78a22d7d30558f304176e16e4d08be3cdcc57
+    :git: https://github.com/stripe-ios/stripe-ios.git
 
 SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
@@ -469,14 +495,14 @@ SPEC CHECKSUMS:
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNCPicker: cb57c823d5ce8d2d0b5dfb45ad97b737260dc59e
   RNScreens: d6da2b9e29cf523832c2542f47bf1287318b1868
-  Stripe: b2426ce648aa240a812b6749c09d3839111a9cbb
-  stripe-react-native: 279c702d7c954317913c74594439d48b022b7c74
-  StripeApplePay: 0b0b744805d36940fd58d0a928c54beb04f1136c
-  StripeCore: 88a3b50b3237b8e1661e48905f2813dedf200540
-  StripeFinancialConnections: d817bcfea7c6c9728dc6801afff813ff77828c65
-  StripeUICore: 5e5abb79e87b86b54919ed7c9d14446254d012a0
+  Stripe: 33cb13d41868ad64a6eabda23c920c5ffa724fa6
+  stripe-react-native: d46787c4a724884460af26bbbe16193df7e38d8c
+  StripeApplePay: 77bbdb76f77e5e387c393e1512d111ee4818e384
+  StripeCore: 5703818b3a9949d8fce1a1b09e51fbe8953eb0ed
+  StripeFinancialConnections: 115d05b11a627e64d2402065b816e1aebae10951
+  StripeUICore: e1829301ad5de8831bc269a8ce8f73c31c26ce42
   Yoga: e7dc4e71caba6472ff48ad7d234389b91dadc280
 
-PODFILE CHECKSUM: 72bfeab5bf84b6ab4999227a1d3e012ee6b3f46e
+PODFILE CHECKSUM: 8c5e32e56ecfce89624d608f6ea9e29a89387ae5
 
 COCOAPODS: 1.11.3
