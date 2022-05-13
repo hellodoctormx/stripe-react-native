@@ -44,7 +44,6 @@ class StripeSdkModule(private val reactContext: ReactApplicationContext) : React
   private var confirmPromise: Promise? = null
   private var confirmPaymentSheetPaymentPromise: Promise? = null
   private var presentPaymentSheetPromise: Promise? = null
-  private var initPaymentSheetPromise: Promise? = null
   private var confirmPaymentClientSecret: String? = null
 
   private var googlePayFragment: GooglePayFragment? = null
@@ -175,21 +174,6 @@ class StripeSdkModule(private val reactContext: ReactApplicationContext) : React
         }
         presentPaymentSheetPromise = null
       }
-      else if (intent.action == ON_INIT_PAYMENT_SHEET) {
-        initPaymentSheetPromise?.resolve(WritableNativeMap())
-      } else if (intent.action == ON_CONFIGURE_FLOW_CONTROLLER) {
-        val label = intent.extras?.getString("label")
-        val image = intent.extras?.getString("image")
-
-        if (label != null && image != null) {
-          val option: WritableMap = WritableNativeMap()
-          option.putString("label", label)
-          option.putString("image", image)
-          initPaymentSheetPromise?.resolve(createResult("paymentOption", option))
-        } else {
-          initPaymentSheetPromise?.resolve(WritableNativeMap())
-        }
-      }
     }
   }
 
@@ -239,8 +223,6 @@ class StripeSdkModule(private val reactContext: ReactApplicationContext) : React
       val localBroadcastManager = LocalBroadcastManager.getInstance(reactApplicationContext)
       localBroadcastManager.registerReceiver(mPaymentSheetReceiver, IntentFilter(ON_PAYMENT_RESULT_ACTION))
       localBroadcastManager.registerReceiver(mPaymentSheetReceiver, IntentFilter(ON_PAYMENT_OPTION_ACTION))
-      localBroadcastManager.registerReceiver(mPaymentSheetReceiver, IntentFilter(ON_CONFIGURE_FLOW_CONTROLLER))
-      localBroadcastManager.registerReceiver(mPaymentSheetReceiver, IntentFilter(ON_INIT_PAYMENT_SHEET))
 
       localBroadcastManager.registerReceiver(googlePayReceiver, IntentFilter(ON_INIT_GOOGLE_PAY))
       localBroadcastManager.registerReceiver(googlePayReceiver, IntentFilter(ON_GOOGLE_PAY_RESULT))
@@ -253,9 +235,7 @@ class StripeSdkModule(private val reactContext: ReactApplicationContext) : React
   @ReactMethod
   fun initPaymentSheet(params: ReadableMap, promise: Promise) {
     getCurrentActivityOrResolveWithError(promise)?.let { activity ->
-      this.initPaymentSheetPromise = promise
-
-      paymentSheetFragment = PaymentSheetFragment().also {
+      paymentSheetFragment = PaymentSheetFragment(promise).also {
         val bundle = toBundleObject(params)
         it.arguments = bundle
       }

@@ -16,12 +16,14 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.WritableNativeMap
 import com.stripe.android.paymentsheet.PaymentOptionCallback
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResultCallback
 import java.io.ByteArrayOutputStream
 
-class PaymentSheetFragment : Fragment() {
+class PaymentSheetFragment(private val promise: Promise) : Fragment() {
   private var paymentSheet: PaymentSheet? = null
   private var flowController: PaymentSheet.FlowController? = null
   private var paymentIntentClientSecret: String? = null
@@ -54,6 +56,12 @@ class PaymentSheetFragment : Fragment() {
     val billingDetailsBundle = arguments?.getBundle("defaultBillingDetails")
     paymentIntentClientSecret = arguments?.getString("paymentIntentClientSecret").orEmpty()
     setupIntentClientSecret = arguments?.getString("setupIntentClientSecret").orEmpty()
+    val appearance = try {
+      buildPaymentSheetAppearance(arguments?.getBundle("appearance"))
+    } catch (error: PaymentSheetAppearanceException) {
+      promise.resolve(createError(ErrorType.Failed.toString(), error))
+      return
+    }
 
     val paymentOptionCallback = PaymentOptionCallback { paymentOption ->
       val intent = Intent(ON_PAYMENT_OPTION_ACTION)
@@ -110,7 +118,8 @@ class PaymentSheetFragment : Fragment() {
         environment = if (testEnv == true) PaymentSheet.GooglePayConfiguration.Environment.Test else PaymentSheet.GooglePayConfiguration.Environment.Production,
         countryCode = countryCode,
         currencyCode = currencyCode
-      ) else null
+      ) else null,
+      appearance = appearance
     )
 
     if (arguments?.getBoolean("customFlow") == true) {
@@ -118,8 +127,7 @@ class PaymentSheetFragment : Fragment() {
       configureFlowController()
     } else {
       paymentSheet = PaymentSheet(this, paymentResultCallback)
-      val intent = Intent(ON_INIT_PAYMENT_SHEET)
-      localBroadcastManager.sendBroadcast(intent)
+      promise.resolve(WritableNativeMap())
     }
   }
 
@@ -141,17 +149,15 @@ class PaymentSheetFragment : Fragment() {
 
   private fun configureFlowController() {
     val onFlowControllerConfigure = PaymentSheet.FlowController.ConfigCallback { _, _ ->
-      val paymentOption = flowController?.getPaymentOption()
-      val intent = Intent(ON_CONFIGURE_FLOW_CONTROLLER)
-
-      paymentOption?.let {
+      flowController?.getPaymentOption()?.let {
         val bitmap = getBitmapFromVectorDrawable(context, it.drawableResourceId)
         val imageString = getBase64FromBitmap(bitmap)
-
-        intent.putExtra("label", it.label)
-        intent.putExtra("image", imageString)
+        val option = WritableNativeMap()
+        option.putString("label", it.label)
+        option.putString("image", imageString)
+        promise.resolve(createResult("paymentOption", option))
       }
-      localBroadcastManager.sendBroadcast(intent)
+      promise.resolve(WritableNativeMap())
     }
 
     if (!paymentIntentClientSecret.isNullOrEmpty()) {
