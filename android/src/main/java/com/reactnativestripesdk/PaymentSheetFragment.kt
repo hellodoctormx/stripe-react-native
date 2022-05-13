@@ -52,7 +52,6 @@ class PaymentSheetFragment(private val promise: Promise) : Fragment() {
     val googlePayEnabled = arguments?.getBoolean("googlePay")
     val testEnv = arguments?.getBoolean("testEnv")
     val allowsDelayedPaymentMethods = arguments?.getBoolean("allowsDelayedPaymentMethods")
-    val primaryButtonColorHexStr = arguments?.getString("primaryButtonColor").orEmpty()
     val billingDetailsBundle = arguments?.getBundle("defaultBillingDetails")
     paymentIntentClientSecret = arguments?.getString("paymentIntentClientSecret").orEmpty()
     setupIntentClientSecret = arguments?.getString("setupIntentClientSecret").orEmpty()
@@ -83,11 +82,6 @@ class PaymentSheetFragment(private val promise: Promise) : Fragment() {
       localBroadcastManager.sendBroadcast(intent)
     }
 
-    var primaryButtonColor: ColorStateList? = null
-    if (primaryButtonColorHexStr.isNotEmpty()) {
-      primaryButtonColor = ColorStateList.valueOf(Color.parseColor(primaryButtonColorHexStr))
-    }
-
     var defaultBillingDetails: PaymentSheet.BillingDetails? = null
     if (billingDetailsBundle != null) {
       val addressBundle = billingDetailsBundle.getBundle("address")
@@ -108,7 +102,6 @@ class PaymentSheetFragment(private val promise: Promise) : Fragment() {
     paymentSheetConfiguration = PaymentSheet.Configuration(
       merchantDisplayName = merchantDisplayName,
       allowsDelayedPaymentMethods = allowsDelayedPaymentMethods ?: false,
-      primaryButtonColor = primaryButtonColor,
       defaultBillingDetails=defaultBillingDetails,
       customer = if (customerId.isNotEmpty() && customerEphemeralKeySecret.isNotEmpty()) PaymentSheet.CustomerConfiguration(
         id = customerId,
