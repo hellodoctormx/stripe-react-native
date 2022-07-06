@@ -78,7 +78,7 @@ to your `app.json` file, where `merchantIdentifier` is the Apple merchant ID obt
 
 _Components_
 
-In order to use [CardForm](https://stripe.dev/stripe-react-native/api-reference/modules.html#CardForm) component, you need to install and configure [Material Components theme](https://github.com/material-components/material-components-android/blob/master/docs/getting-started.md#4-change-your-app-theme-to-inherit-from-a-material-components-theme) in your app.
+In order to use [CardForm](https://stripe.dev/stripe-react-native/api-reference/index.html#CardForm) component, you need to install and configure [Material Components theme](https://github.com/material-components/material-components-android/blob/master/docs/getting-started.md#4-change-your-app-theme-to-inherit-from-a-material-components-theme) in your app.
 
 1. Add below dependency to your `app/build.gradle` file with specified version
 
@@ -96,7 +96,7 @@ implementation 'com.google.android.material:material:<version>'
 
 #### iOS
 
-Compatible with apps targeting iOS 12 or above.
+The Stripe React Native SDK requires Xcode 13.2.1 or later and is compatible with apps targeting iOS 12 or above. For iOS 11 support, please use [`@stripe/stripe-react-native@0.5.0`](https://github.com/stripe/stripe-react-native/releases/tag/v0.5.0).
 
 The SDK uses TypeScript features available in Babel version `7.9.0` and above.
 Alternatively use the `plugin-transform-typescript` plugin in your project.
@@ -201,7 +201,7 @@ function App() {
 }
 ```
 
-You can find more details about the `StripeProvider` component in the [API reference](https://stripe.dev/stripe-react-native/api-reference/modules.html#stripeprovider).
+You can find more details about the `StripeProvider` component in the [API reference](https://stripe.dev/stripe-react-native/api-reference/index.html#StripeProvider).
 
 ##### Additional steps for webhook forwarding
 

@@ -38,7 +38,7 @@ class CardFormViewManager : SimpleViewManager<CardFormView>() {
 
    @ReactProp(name = "placeholders")
    fun setPlaceHolders(view: CardFormView, placeholders: ReadableMap) {
-     view.setPlaceHolders(placeholders);
+     view.setPlaceHolders(placeholders)
    }
 
   @ReactProp(name = "autofocus")
@@ -49,6 +49,11 @@ class CardFormViewManager : SimpleViewManager<CardFormView>() {
   @ReactProp(name = "cardStyle")
   fun setCardStyle(view: CardFormView, cardStyle: ReadableMap) {
     view.setCardStyle(cardStyle)
+  }
+
+  @ReactProp(name = "defaultValues")
+  fun setDefaultValues(view: CardFormView, defaults: ReadableMap) {
+    view.setDefaultValues(defaults)
   }
 
   override fun createViewInstance(reactContext: ThemedReactContext): CardFormView {

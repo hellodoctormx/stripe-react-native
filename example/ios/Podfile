@@ -19,7 +19,10 @@ target 'StripeSdkExample' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-  pod 'stripe-react-native', path: '../..'
+
+  pod 'stripe-react-native',
+      :path => '../..',
+      :testspecs => ['Tests']
 
   # Enables Flipper.
   # Note that if you have use_frameworks! enabled, Flipper will not work and
