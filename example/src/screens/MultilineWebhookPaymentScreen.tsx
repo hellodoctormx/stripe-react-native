@@ -31,7 +31,7 @@ export default function MultilineWebhookPaymentScreen() {
       body: JSON.stringify({
         email,
         currency: 'usd',
-        items: [{ id: 'id' }],
+        items: ['id-1'],
         // request_three_d_secure: 'any',
       }),
     });
@@ -162,6 +162,7 @@ const inputStyles: CardFormView.Styles = {
   borderRadius: 10,
   cursorColor: '#000000',
   fontSize: 16,
+  fontFamily: 'Macondo-Regular',
   placeholderColor: '#A020F0',
   textErrorColor: '#ff0000',
 };

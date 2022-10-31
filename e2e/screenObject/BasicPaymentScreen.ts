@@ -106,7 +106,7 @@ class BasicPaymentScreen {
           button.click();
           driver.pause(2000);
 
-          button = $(`button*=Done`);
+          button = $(`//button[@data-testid='done-button']`);
           button.click();
           break;
         }
@@ -146,7 +146,7 @@ export function getAllWebviewContexts(): string[] {
   });
 }
 
-function getNativeContext(): string {
+export function getNativeContext(): string {
   const allContexts = driver.getContexts();
 
   const nativeContext = allContexts.find((contextName) =>

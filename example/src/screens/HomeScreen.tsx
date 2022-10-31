@@ -19,9 +19,11 @@ export default function HomeScreen() {
 
   const handleDeepLink = useCallback(
     async (url: string | null) => {
-      if (url && url.includes('safepay')) {
-        await handleURLCallback(url);
-        navigation.navigate('PaymentResultScreen', { url });
+      if (url) {
+        const stripeHandled = await handleURLCallback(url);
+        if (stripeHandled) {
+          navigation.navigate('PaymentResultScreen', { url });
+        }
       }
     },
     [navigation, handleURLCallback]
@@ -54,6 +56,14 @@ export default function HomeScreen() {
               title="Prebuilt UI (single-step)"
               onPress={() => {
                 navigation.navigate('PaymentsUICompleteScreen');
+              }}
+            />
+          </View>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Prebuilt UI for Subscription"
+              onPress={() => {
+                navigation.navigate('PaymentSheetWithSetupIntent');
               }}
             />
           </View>
@@ -284,6 +294,14 @@ export default function HomeScreen() {
               }}
             />
           </View>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Affirm"
+              onPress={() => {
+                navigation.navigate('AffirmScreen');
+              }}
+            />
+          </View>
         </>
       </Collapse>
 
@@ -355,6 +373,18 @@ export default function HomeScreen() {
               onPress={() => {
                 // navigation.navigate('WeChatPaymentScreen');
                 Alert.alert('WeChat Pay is not yet supported.');
+              }}
+            />
+          </View>
+        </>
+      </Collapse>
+      <Collapse title="Financial Connections">
+        <>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Collect Bank Account"
+              onPress={() => {
+                navigation.navigate('CollectBankAccountScreen');
               }}
             />
           </View>

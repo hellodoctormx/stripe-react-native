@@ -73,7 +73,7 @@ to your `app.json` file, where `merchantIdentifier` is the Apple merchant ID obt
 #### Android
 
 - Android 5.0 (API level 21) and above
-  - Your `compileSdkVersion` must be `31`. See [this issue](https://github.com/stripe/stripe-react-native/issues/812) for potential workarounds.
+  - Your `compileSdkVersion` must be `33`. See [this issue](https://github.com/stripe/stripe-react-native/issues/812) for potential workarounds.
 - Android gradle plugin 4.x and above
 
 _Components_
@@ -113,7 +113,8 @@ function App() {
   return (
     <StripeProvider
       publishableKey={publishableKey}
-      merchantIdentifier="merchant.identifier"
+      merchantIdentifier="merchant.identifier" // required for Apple Pay
+      urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
     >
       <PaymentScreen />
     </StripeProvider>
@@ -176,7 +177,8 @@ function App() {
   return (
     <StripeProvider
       publishableKey={publishableKey}
-      merchantIdentifier="merchant.identifier"
+      merchantIdentifier="merchant.identifier" // required for Apple Pay
+      urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
     >
       // Your app code here
     </StripeProvider>
@@ -196,6 +198,7 @@ function App() {
     initStripe({
       publishableKey: publishableKey,
       merchantIdentifier: 'merchant.identifier',
+      urlScheme: "your-url-scheme",
     });
   }, []);
 }
@@ -255,7 +258,7 @@ Follow these steps to resolve this:
 
 - Open your project via Xcode, go to `project -> build settings`, find `library search paths` and remove all swift related entries such as:
   `$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)` and `$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)`.
-- Create a new Swift file to the project (File > New > File > Swift), give it any name (e.g. `Fix.swift`) and create a bridging header when prompted by Xcode.
+- Create a new Swift file to the project (File > New > File > Swift), give it any name (e.g. `Fix.swift`), check the appropriate Targets and create a bridging header when prompted by Xcode.
 
 ### `TypeError: null is not an object (evaluating '_NativeStripeSdk.default.initialise')` on Android
 

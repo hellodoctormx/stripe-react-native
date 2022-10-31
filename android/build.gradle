@@ -8,7 +8,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.2.2'
+    classpath 'com.android.tools.build:gradle:7.2.2'
     // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
@@ -152,9 +152,4 @@ dependencies {
   androidTestImplementation "androidx.test:core:1.4.0"
   androidTestImplementation 'androidx.test:runner:1.1.0'
   androidTestImplementation "org.mockito:mockito-core:3.+"
-}
-
-configurations {
-    // We want to include all of our compileOnly libraries in our tests
-    androidTestImplementation.extendsFrom compileOnly
 }

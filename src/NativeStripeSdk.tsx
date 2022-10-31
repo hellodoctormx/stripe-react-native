@@ -1,6 +1,7 @@
 import { NativeModules } from 'react-native';
 import type {
   PaymentMethod,
+  PaymentIntent,
   ApplePay,
   PaymentSheet,
   SetupIntent,
@@ -27,6 +28,7 @@ import type {
   IsCardInWalletResult,
   CanAddCardToWalletParams,
   CanAddCardToWalletResult,
+  FinancialConnections,
 } from './types';
 
 type NativeStripeSdkType = {
@@ -36,12 +38,13 @@ type NativeStripeSdkType = {
     options: PaymentMethod.CreateOptions
   ): Promise<CreatePaymentMethodResult>;
   handleNextAction(
-    paymentIntentClientSecret: string
+    paymentIntentClientSecret: string,
+    returnURL?: string | null
   ): Promise<HandleNextActionResult>;
   confirmPayment(
     paymentIntentClientSecret: string,
-    params: PaymentMethod.ConfirmParams,
-    options: PaymentMethod.ConfirmOptions
+    params?: PaymentIntent.ConfirmParams,
+    options?: PaymentIntent.ConfirmOptions
   ): Promise<ConfirmPaymentResult>;
   isApplePaySupported(): Promise<boolean>;
   presentApplePay(params: ApplePay.PresentParams): Promise<ApplePayResult>;
@@ -96,6 +99,12 @@ type NativeStripeSdkType = {
   isCardInWallet(params: {
     cardLastFour: string;
   }): Promise<IsCardInWalletResult>;
+  collectBankAccountToken(
+    clientSecret: string
+  ): Promise<FinancialConnections.TokenResult>;
+  collectFinancialConnectionsAccounts(
+    clientSecret: string
+  ): Promise<FinancialConnections.SessionResult>;
 };
 
 const { StripeSdk } = NativeModules;
