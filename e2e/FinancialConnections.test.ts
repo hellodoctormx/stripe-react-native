@@ -53,12 +53,19 @@ describe('Financial Connections', () => {
 });
 
 function authorizeBankAccount() {
-  driver.pause(5000);
+  driver.waitUntil(() => getAllWebviewContexts().length > 0, {
+    timeout: 10000,
+    interval: 1000,
+  });
   const webviewContexts = getAllWebviewContexts();
   for (const context of webviewContexts) {
     try {
       driver.switchContext(context);
       let button = $(`button*=Enter account details manually instead`);
+      driver.waitUntil(() => button.isDisplayed(), {
+        timeout: 10000,
+        interval: 1000,
+      });
       if (button.isDisplayed()) {
         button.click();
         driver.pause(2000);

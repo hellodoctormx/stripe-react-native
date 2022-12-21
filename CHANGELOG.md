@@ -4,17 +4,77 @@
 
 ### Breaking changes
 
+- `createPlatformPayPaymentMethod` no longer returns a `token` object. [#1236](https://github.com/stripe/stripe-react-native/issues/1236)
+  - If your integration depends on Stripe's Tokens API, please use `createPlatformPayToken`, which accepts identical arguments.
+
+## Fixes
+
+- Fixed an issue with `createPlatformPayPaymentMethod` on iOS where a "Canceled" error could be returned in production. [#1236](https://github.com/stripe/stripe-react-native/issues/1236)
+- Fixed an issue where the `PlatformPayButton` with `type={PlatformPay.ButtonType.GooglePayMark}` would be unclickable. [#1236](https://github.com/stripe/stripe-react-native/issues/1236)
+
+## 0.22.1 - 2022-12-07
+
+## Fixes
+
+- Fixed the `ShippingMethod` type to contain the `isPending` field instead of a `type` field (which previously was never correct). This reflects the inputs accepted. [#1227](https://github.com/stripe/stripe-react-native/pull/1227)
+- Fixed the `ShippingMethod` type to contain the `startDate` and `endDate` keys, if applicable. [#1227](https://github.com/stripe/stripe-react-native/pull/1227)
+- Fixed instances of the "duplicate registered views" error. [#1233](https://github.com/stripe/stripe-react-native/pull/1233)
+- Fixed extra margin that was being added to `<CardForm />` on Android. [#1234](https://github.com/stripe/stripe-react-native/pull/1234)
+
+## 0.22.0 - 2022-12-02
+
+### Breaking changes
+
 ### New features
 
+- Added the `hasPairedAppleWatch` option to `canAddCardToWallet`. [#1219](https://github.com/stripe/stripe-react-native/pull/1219)
+- Added new functions and a new component to streamline integrating with Apple and Google Pay and add more feature support. See the [Migrating to Platform Pay guide](https://github.com/stripe/stripe-react-native/blob/master/docs/Platform-Pay-Migration.md) for more details. The old Apple and Google Pay APIs are marked as `deprecated` and will be removed in a future release, but are still supported in this version.
+
+## Fixes
+
+- Fixed an issue where builds would error with the message `'const' enums are not supported.` [see commit](https://github.com/stripe/stripe-react-native/commit/f882bfa588aa6d23a980b4b43d2cca660ca1dd2a)
+- Fixed an issue where the `canAddCardToWallet` method would sometimes wrongly return `false` with a `details.status` of `MISSING_CONFIGURATION` in production builds. [#1215](https://github.com/stripe/stripe-react-native/pull/1215)
+- Fixed an issue on Android where, for certain countries, the postal code would not be enabled but would still be required. [#1213](https://github.com/stripe/stripe-react-native/pull/1213)
+- Fixed an issue on iOS where `canAddCardToWallet` would return `false` if the card had already been provisioned on a paired device like an Apple Watch, but had not yet been provisioned on the current device, and would also return `false` if the card had been provisioned on the current device, but not on a paired Apple Watch. [#1219](https://github.com/stripe/stripe-react-native/pull/1219)
+
+## 0.21.0 - 2022-11-15
+
+### Breaking changes
+
+### New features
+
+- Added the `<AddressSheet />` component, which enables you to collect local and international shipping or billing addresses from your customers _with_ address autocomplete. [#1169](https://github.com/stripe/stripe-react-native/pull/1169)
+  - [Find the docs here](https://stripe.com/docs/elements/address-element?platform=react-native)
+- Added the `defaultShippingDetails` field to the `params` argument in `initPaymentSheet(params)`. This will allow you to collect shipping details (either in your own UI or using the new `<AddressSheet />` component) for payments in the Payment Sheet. [#1169](https://github.com/stripe/stripe-react-native/pull/1169)
+
+## Fixes
+
+- Fixed a build error on Android when using Kotlin version 1.7.10. [#1195](https://github.com/stripe/stripe-react-native/pull/1195)
+
+## 0.20.0 - 2022-11-03
+
+### Breaking changes
+
+- This library now supports iOS 13 and up, due to `stripe-ios` increasing the deployment target. If you would like to build for iOS 12, please continue to use `@stripe/stripe-react-native@0.19.0`. [#1190](https://github.com/stripe/stripe-react-native/pull/1190)
+
+### New features
+
+- Added [Link](https://stripe.com/docs/payments/link) support in Payment Sheet. [#1176](https://github.com/stripe/stripe-react-native/pull/1176)
+- Added the `resetPaymentSheetCustomer` method to clear persisted authentication state in the PaymentSheet. [#1176](https://github.com/stripe/stripe-react-native/pull/1176)
+- Added `preferredNetwork` and `availableNetworks` fields to the `CardResult` payment method. [#1176](https://github.com/stripe/stripe-react-native/pull/1176)
 - Added support for custom fonts to `CardForm` and `CardView` on Android. [#1150](https://github.com/stripe/stripe-react-native/pull/1150)
+- Added support for customizing the call to action button label in Payment Sheet by providing the `primaryButtonLabel` property to `initPaymentSheet()`. [#1190](https://github.com/stripe/stripe-react-native/pull/1190)
 
 ## Fixes
 
 - Fixed an issue on iOS where `confirmSetupIntent` would throw an error if the `Card` payment method was provided with the `paymentMethodId` parameter. [#1151](https://github.com/stripe/stripe-react-native/pull/1151)
+- Upgraded `stripe-android` to 20.15.+. [#1176](https://github.com/stripe/stripe-react-native/pull/1176)
+- Upgraded `stripe-ios` to 23.1.+. [#1190](https://github.com/stripe/stripe-react-native/pull/1190)
+- Fixed `FinancialConnections.Subcategory` and `FinancialConnections.Permission` types to be camel-case instead of snake case. [#1176](https://github.com/stripe/stripe-react-native/pull/1176)
 - Fixed an issue with Financial Connections on iOS where the app wouldn't properly redirect back after authentication. [#1178](https://github.com/stripe/stripe-react-native/pull/1178)
 - Fixed `borderWidth` and `borderRadius` for `<CardField />` and `CardForm />` was inconsistent across iOS and Android. [#1182](https://github.com/stripe/stripe-react-native/pull/1182)
 
-## 0.19.0 - 2022-09-16
+## 0.19.0 - 2022-09-16 (📌 Expo SDK 47)
 
 ### Breaking changes
 

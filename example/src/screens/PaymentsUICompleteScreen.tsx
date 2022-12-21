@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Alert } from 'react-native';
 import {
+  AddressDetails,
   useStripe,
   BillingDetails,
   Address,
   PaymentSheetError,
+  AddressSheet,
+  AddressSheetError,
 } from '@stripe/stripe-react-native';
 import Button from '../components/Button';
 import PaymentScreen from '../components/PaymentScreen';
@@ -12,9 +15,11 @@ import { API_URL } from '../Config';
 import appearance from './PaymentSheetAppearance';
 
 export default function PaymentsUICompleteScreen() {
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const { initPaymentSheet, presentPaymentSheet, resetPaymentSheetCustomer } =
+    useStripe();
   const [paymentSheetEnabled, setPaymentSheetEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [addressSheetVisible, setAddressSheetVisible] = useState(false);
   const [clientSecret, setClientSecret] = useState<string>();
 
   const fetchPaymentSheetParams = async () => {
@@ -57,7 +62,7 @@ export default function PaymentsUICompleteScreen() {
     setLoading(false);
   };
 
-  const initialisePaymentSheet = async () => {
+  const initialisePaymentSheet = async (shippingDetails?: AddressDetails) => {
     const { paymentIntent, ephemeralKey, customer } =
       await fetchPaymentSheetParams();
 
@@ -90,8 +95,10 @@ export default function PaymentsUICompleteScreen() {
       },
       returnURL: 'stripe-example://stripe-redirect',
       defaultBillingDetails: billingDetails,
+      defaultShippingDetails: shippingDetails,
       allowsDelayedPaymentMethods: true,
       appearance,
+      primaryButtonLabel: 'purchase! 😃',
     });
     if (!error) {
       setPaymentSheetEnabled(true);
@@ -113,11 +120,64 @@ export default function PaymentsUICompleteScreen() {
     // To reduce loading time, make this request before the Checkout button is tapped, e.g. when the screen is loaded.
     <PaymentScreen onInit={initialisePaymentSheet}>
       <Button
+        variant="default"
+        loading={loading}
+        disabled={!paymentSheetEnabled}
+        title="Add shipping"
+        onPress={() => setAddressSheetVisible(true)}
+      />
+      <Button
         variant="primary"
         loading={loading}
         disabled={!paymentSheetEnabled}
         title="Checkout"
         onPress={openPaymentSheet}
+      />
+      <AddressSheet
+        visible={addressSheetVisible}
+        onSubmit={async (result) => {
+          setPaymentSheetEnabled(false);
+          setAddressSheetVisible(false);
+          console.log(JSON.stringify(result, null, 2));
+          await initialisePaymentSheet(result);
+        }}
+        onError={(err) => {
+          if (err.code === AddressSheetError.Failed) {
+            Alert.alert('There was an error.', 'Check the logs for details.');
+            console.log(err?.localizedMessage);
+          }
+          setAddressSheetVisible(false);
+        }}
+        presentationStyle={'popover'}
+        animationStyle={'flip'}
+        appearance={{}}
+        defaultValues={{
+          name: 'Michael Scott',
+          phone: '111-222-3333',
+          isCheckboxSelected: true,
+          address: {
+            country: 'United States',
+            line1: 'Dunder Mifflin',
+            postalCode: '12345',
+            city: 'Scranton',
+          },
+        }}
+        additionalFields={{
+          phoneNumber: 'required',
+          checkboxLabel: 'Send me lots of emails',
+        }}
+        // allowedCountries={['US', 'CA']}
+        // autocompleteCountries={['CA']}
+        primaryButtonTitle={'use this address'}
+        sheetTitle={'🧙‍♀️ custom title'}
+        googlePlacesApiKey={'this-api-key-wont-work'}
+      />
+      <Button
+        title="Reset customer"
+        onPress={async () => {
+          // Link will still be presented for the customer if you pass in the customer ID and ephemeral key to payment sheet
+          await resetPaymentSheetCustomer();
+        }}
       />
     </PaymentScreen>
   );

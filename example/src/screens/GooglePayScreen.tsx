@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
-  GooglePayButton,
-  useGooglePay,
   AddToWalletButton,
   Constants,
   canAddCardToWallet,
+  createPlatformPayPaymentMethod,
+  createPlatformPayToken,
+  confirmPlatformPayPayment,
   GooglePayCardToken,
+  isPlatformPaySupported,
+  PlatformPay,
+  PlatformPayButton,
 } from '@stripe/stripe-react-native';
 import PaymentScreen from '../components/PaymentScreen';
 import { API_URL } from '../Config';
@@ -16,24 +20,24 @@ import AddToGooglePayPNG from '../assets/Add-to-Google-Pay-Button-dark-no-shadow
 const LIVE_CARD_ID = 'ic_1KnTM2F05jLespP6wNLZQ1mu';
 
 export default function GooglePayScreen() {
-  const {
-    isGooglePaySupported,
-    initGooglePay,
-    presentGooglePay,
-    loading,
-    createGooglePayPaymentMethod,
-  } = useGooglePay();
-  const [initialized, setInitialized] = useState(false);
+  const [isGooglePaySupported, setIsGooglePaySupported] = useState(false);
   const [ephemeralKey, setEphemeralKey] = useState({});
   const [showAddToWalletButton, setShowAddToWalletButton] = useState(true);
   const [cardDetails, setCardDetails] = useState<any>(null);
   const [androidCardToken, setAndroidCardToken] =
     useState<null | GooglePayCardToken>(null);
+  const [clientSecret, setClientSecret] = useState<String | null>(null);
 
   useEffect(() => {
     fetchEphemeralKey();
     checkIfCardInWallet();
+    checkIfGooglePayIsSupported();
+    fetchPaymentIntentClientSecret();
   }, []);
+
+  const checkIfGooglePayIsSupported = async () => {
+    setIsGooglePaySupported(await isPlatformPaySupported());
+  };
 
   const checkIfCardInWallet = async () => {
     const response = await fetch(`${API_URL}/issuing-card-details`, {
@@ -82,75 +86,97 @@ export default function GooglePayScreen() {
         force3dSecure: true,
       }),
     });
-    const { clientSecret } = await response.json();
-
-    return clientSecret;
+    const result = await response.json();
+    if (!result.clientSecret) {
+      Alert.alert('Error fetching client secret.', result.error);
+    }
+    setClientSecret(result.clientSecret);
   };
 
   const pay = async () => {
-    // 2. Fetch payment intent client secret
-    const clientSecret = await fetchPaymentIntentClientSecret();
-
-    // 3. Open Google Pay sheet and proceed a payment
-    const { error } = await presentGooglePay({
-      clientSecret,
-      forSetupIntent: false,
-    });
+    const { error, paymentIntent } = await confirmPlatformPayPayment(
+      clientSecret as string,
+      {
+        googlePay: {
+          testEnv: true,
+          merchantName: 'Test',
+          merchantCountryCode: 'US',
+          currencyCode: 'usd',
+          billingAddressConfig: {
+            format: PlatformPay.BillingAddressFormat.Full,
+            isPhoneNumberRequired: true,
+            isRequired: true,
+          },
+        },
+      }
+    );
 
     if (error) {
-      Alert.alert(error.code, error.message);
-      return;
+      Alert.alert('Failure', error.localizedMessage);
+    } else {
+      Alert.alert('Success', 'Check the logs for payment intent details.');
+      console.log(JSON.stringify(paymentIntent, null, 2));
+      setClientSecret(null);
     }
-    Alert.alert('Success', 'The payment was confirmed successfully.');
-    setInitialized(false);
   };
 
   /*
     As an alternative you can only create a paymentMethod instead of confirming the payment.
   */
   const createPaymentMethod = async () => {
-    const { error, paymentMethod } = await createGooglePayPaymentMethod({
-      amount: 12,
-      currencyCode: 'USD',
+    const { error, paymentMethod } = await createPlatformPayPaymentMethod({
+      googlePay: {
+        amount: 12,
+        currencyCode: 'USD',
+        testEnv: true,
+        merchantName: 'Test',
+        merchantCountryCode: 'US',
+        billingAddressConfig: {
+          format: PlatformPay.BillingAddressFormat.Full,
+          isPhoneNumberRequired: true,
+          isRequired: true,
+        },
+        shippingAddressConfig: {
+          isRequired: true,
+        },
+        isEmailRequired: true,
+      },
     });
 
     if (error) {
-      Alert.alert(error.code, error.message);
-      return;
-    } else if (paymentMethod) {
-      Alert.alert(
-        'Success',
-        `The payment method was created successfully. paymentMethodId: ${paymentMethod.id}`
-      );
+      Alert.alert('Failure', error.localizedMessage);
+    } else {
+      Alert.alert('Success', 'Check the logs for payment method details.');
+      console.log(JSON.stringify(paymentMethod, null, 2));
     }
-    setInitialized(false);
   };
 
-  // 1. Initialize Google Pay
-  const initialize = async () => {
-    if (!(await isGooglePaySupported({ testEnv: true }))) {
-      Alert.alert('Google Pay is not supported.');
-      return;
-    }
-
-    const { error } = await initGooglePay({
-      testEnv: true,
-      merchantName: 'Test',
-      countryCode: 'US',
-      billingAddressConfig: {
-        format: 'FULL',
-        isPhoneNumberRequired: true,
-        isRequired: false,
+  const createToken = async () => {
+    const { error, token } = await createPlatformPayToken({
+      googlePay: {
+        amount: 12,
+        currencyCode: 'USD',
+        testEnv: true,
+        merchantName: 'Test',
+        merchantCountryCode: 'US',
+        billingAddressConfig: {
+          format: PlatformPay.BillingAddressFormat.Full,
+          isPhoneNumberRequired: true,
+          isRequired: true,
+        },
+        shippingAddressConfig: {
+          isRequired: true,
+        },
+        isEmailRequired: true,
       },
-      existingPaymentMethodRequired: false,
-      isEmailRequired: true,
     });
 
     if (error) {
-      Alert.alert(error.code, error.message);
-      return;
+      Alert.alert('Failure', error.localizedMessage);
+    } else {
+      Alert.alert('Success', 'Check the logs for token details.');
+      console.log(JSON.stringify(token, null, 2));
     }
-    setInitialized(true);
   };
 
   const fetchEphemeralKey = async () => {
@@ -169,44 +195,54 @@ export default function GooglePayScreen() {
   };
 
   return (
-    <PaymentScreen onInit={initialize}>
-      <GooglePayButton
-        disabled={!initialized || loading}
-        style={styles.payButton}
-        type="pay"
-        onPress={pay}
-      />
-
+    <PaymentScreen>
       <View style={styles.row}>
-        <GooglePayButton
-          disabled={!initialized || loading}
-          style={styles.standardButton}
-          type="standard"
-          onPress={createPaymentMethod}
+        <PlatformPayButton
+          disabled={!isGooglePaySupported || !clientSecret}
+          style={styles.payButton}
+          type={PlatformPay.ButtonType.Pay}
+          onPress={pay}
         />
       </View>
-      {showAddToWalletButton && (
-        <AddToWalletButton
-          androidAssetSource={Image.resolveAssetSource(AddToGooglePayPNG)}
-          style={styles.addToWalletButton}
-          cardDetails={{
-            name: cardDetails?.cardholder?.name,
-            primaryAccountIdentifier:
-              cardDetails?.wallet?.primary_account_identifier,
-            lastFour: cardDetails?.last4,
-            description: 'Added by Stripe',
-          }}
-          token={androidCardToken}
-          ephemeralKey={ephemeralKey}
-          onComplete={({ error }) => {
-            Alert.alert(
-              error ? error.code : 'Success',
-              error
-                ? error.message
-                : 'Card was successfully added to the wallet.'
-            );
-          }}
+
+      <View style={styles.row}>
+        <PlatformPayButton
+          disabled={!isGooglePaySupported}
+          style={styles.standardButton}
+          type={PlatformPay.ButtonType.GooglePayMark}
+          onPress={createPaymentMethod}
         />
+
+        <PlatformPayButton
+          disabled={!isGooglePaySupported}
+          style={styles.standardButton}
+          onPress={createToken}
+        />
+      </View>
+      {showAddToWalletButton && isGooglePaySupported && (
+        <View style={styles.row}>
+          <AddToWalletButton
+            androidAssetSource={Image.resolveAssetSource(AddToGooglePayPNG)}
+            style={styles.addToWalletButton}
+            cardDetails={{
+              name: cardDetails?.cardholder?.name,
+              primaryAccountIdentifier:
+                cardDetails?.wallet?.primary_account_identifier,
+              lastFour: cardDetails?.last4,
+              description: 'Added by Stripe',
+            }}
+            token={androidCardToken}
+            ephemeralKey={ephemeralKey}
+            onComplete={({ error }) => {
+              Alert.alert(
+                error ? error.code : 'Success',
+                error
+                  ? error.message
+                  : 'Card was successfully added to the wallet.'
+              );
+            }}
+          />
+        </View>
       )}
     </PaymentScreen>
   );
@@ -215,18 +251,19 @@ export default function GooglePayScreen() {
 const styles = StyleSheet.create({
   row: {
     marginTop: 30,
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-around',
   },
   payButton: {
-    marginTop: 30,
-    width: 182,
+    width: 202,
     height: 48,
   },
   standardButton: {
-    width: 90,
-    height: 40,
+    width: 112,
+    height: 48,
   },
   addToWalletButton: {
-    marginTop: 30,
     width: 190,
     height: 60,
   },

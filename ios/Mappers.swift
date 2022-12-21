@@ -1,4 +1,5 @@
 import Stripe
+import StripePaymentSheet
 
 class Mappers {
     class func createResult(_ key: String, _ value: NSDictionary?) -> NSDictionary {
@@ -145,7 +146,7 @@ class Mappers {
         let tokenMap: NSDictionary = [
             "id": token.tokenId,
             "bankAccount": mapFromBankAccount(token.bankAccount) ?? NSNull(),
-            "created": convertDateToUnixTimestamp(date: token.created) ?? NSNull(),
+            "created": convertDateToUnixTimestampMilliseconds(date: token.created) ?? NSNull(),
             "card": mapFromCard(token.card) ?? NSNull(),
             "livemode": token.livemode,
             "type": mapFromTokenType(token.type) ?? NSNull(),
@@ -179,13 +180,24 @@ class Mappers {
     }
 
     class func mapFromShippingMethod(shippingMethod: PKShippingMethod) -> NSDictionary {
-        let method: NSDictionary = [
+        let method: NSMutableDictionary = [
             "detail": shippingMethod.detail ?? "",
             "identifier": shippingMethod.identifier ?? "",
             "amount": shippingMethod.amount.stringValue,
-            "type": shippingMethod.type,
+            "isPending": shippingMethod.type == .pending,
             "label": shippingMethod.label
         ]
+        
+        if #available(iOS 15.0, *) {
+            if let dateComponentsRange = shippingMethod.dateComponentsRange {
+                method.setObject(
+                    convertDateToUnixTimestampSeconds(date: dateComponentsRange.startDateComponents.date) ?? NSNull(),
+                    forKey: "startDate" as NSCopying)
+                method.setObject(
+                    convertDateToUnixTimestampSeconds(date: dateComponentsRange.endDateComponents.date) ?? NSNull(),
+                    forKey: "endDate" as NSCopying)
+            }
+        }
 
         return method
     }
@@ -371,7 +383,7 @@ class Mappers {
             "paymentMethodId": paymentIntent.paymentMethodId ?? NSNull(),
             "captureMethod": mapCaptureMethod(paymentIntent.captureMethod),
             "confirmationMethod": mapConfirmationMethod(paymentIntent.confirmationMethod),
-            "created": convertDateToUnixTimestamp(date: paymentIntent.created) ?? NSNull(),
+            "created": convertDateToUnixTimestampMilliseconds(date: paymentIntent.created) ?? NSNull(),
             "amount": paymentIntent.amount,
             "lastPaymentError": NSNull(),
             "shipping": NSNull(),
@@ -396,7 +408,7 @@ class Mappers {
         }
 
         if let canceledAt = paymentIntent.canceledAt {
-            intent.setValue(convertDateToUnixTimestamp(date: canceledAt), forKey: "canceledAt")
+            intent.setValue(convertDateToUnixTimestampMilliseconds(date: canceledAt), forKey: "canceledAt")
         }
 
         return intent;
@@ -594,8 +606,11 @@ class Mappers {
             "expMonth": paymentMethod.card?.expMonth ?? NSNull(),
             "fingerprint": paymentMethod.card?.fingerprint ?? NSNull(),
             "funding": paymentMethod.card?.funding ?? NSNull(),
-            "last4": paymentMethod.card?.last4 ?? NSNull()
+            "last4": paymentMethod.card?.last4 ?? NSNull(),
+            "preferredNetwork": paymentMethod.card?.networks?.preferred ?? NSNull(),
+            "availableNetworks": paymentMethod.card?.networks?.available ?? NSNull(),
         ]
+        
         let sepaDebit: NSDictionary = [
             "bankCode": paymentMethod.sepaDebit?.bankCode ?? NSNull(),
             "country": paymentMethod.sepaDebit?.country ?? NSNull(),
@@ -714,7 +729,7 @@ class Mappers {
         }
 
         intent.setValue(types, forKey: "paymentMethodTypes")
-        intent.setValue(convertDateToUnixTimestamp(date: setupIntent.created), forKey: "created")
+        intent.setValue(convertDateToUnixTimestampMilliseconds(date: setupIntent.created), forKey: "created")
 
         if let lastSetupError = setupIntent.lastSetupError {
             let setupError: NSMutableDictionary = [
@@ -924,9 +939,17 @@ class Mappers {
         return uiCustomization
     }
 
-    class func convertDateToUnixTimestamp(date: Date?) -> String? {
+    class func convertDateToUnixTimestampMilliseconds(date: Date?) -> String? {
         if let date = date {
             let value = date.timeIntervalSince1970 * 1000.0
+            return String(format: "%.0f", value)
+        }
+        return nil
+    }
+    
+    class func convertDateToUnixTimestampSeconds(date: Date?) -> String? {
+        if let date = date {
+            let value = date.timeIntervalSince1970
             return String(format: "%.0f", value)
         }
         return nil

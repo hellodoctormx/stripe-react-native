@@ -32,6 +32,8 @@ import type {
   CanAddCardToWalletParams,
   CanAddCardToWalletResult,
   FinancialConnections,
+  PlatformPay,
+  PlatformPayError,
 } from '../types';
 import { useCallback, useEffect, useState } from 'react';
 import { isiOS } from '../helpers';
@@ -64,6 +66,15 @@ import {
   canAddCardToWallet,
   collectBankAccountToken,
   collectFinancialConnectionsAccounts,
+  resetPaymentSheetCustomer,
+  isPlatformPaySupported,
+  confirmPlatformPaySetupIntent,
+  confirmPlatformPayPayment,
+  dismissPlatformPay,
+  createPlatformPayPaymentMethod,
+  createPlatformPayToken,
+  updatePlatformPaySheet,
+  openPlatformPaySetup,
 } from '../functions';
 
 /**
@@ -311,6 +322,80 @@ export function useStripe() {
     []
   );
 
+  const _resetPaymentSheetCustomer = useCallback(async (): Promise<null> => {
+    return resetPaymentSheetCustomer();
+  }, []);
+
+  const _isPlatformPaySupported = useCallback(
+    async (params?: {
+      googlePay?: GooglePay.IsSupportedParams;
+    }): Promise<boolean> => {
+      return isPlatformPaySupported(params);
+    },
+    []
+  );
+
+  const _confirmPlatformPaySetupIntent = useCallback(
+    async (
+      clientSecret: string,
+      params: PlatformPay.ConfirmParams
+    ): Promise<PlatformPay.ConfirmSetupIntentResult> => {
+      return confirmPlatformPaySetupIntent(clientSecret, params);
+    },
+    []
+  );
+
+  const _confirmPlatformPayPayment = useCallback(
+    async (
+      clientSecret: string,
+      params: PlatformPay.ConfirmParams
+    ): Promise<PlatformPay.ConfirmPaymentResult> => {
+      return confirmPlatformPayPayment(clientSecret, params);
+    },
+    []
+  );
+
+  const _dismissPlatformPay = useCallback(async (): Promise<boolean> => {
+    return dismissPlatformPay();
+  }, []);
+
+  const _createPlatformPayPaymentMethod = useCallback(
+    async (
+      params: PlatformPay.PaymentMethodParams
+    ): Promise<PlatformPay.PaymentMethodResult> => {
+      return createPlatformPayPaymentMethod(params);
+    },
+    []
+  );
+
+  const _createPlatformPayToken = useCallback(
+    async (
+      params: PlatformPay.PaymentMethodParams
+    ): Promise<PlatformPay.TokenResult> => {
+      return createPlatformPayToken(params);
+    },
+    []
+  );
+
+  const _updatePlatformPaySheet = useCallback(
+    async (params: {
+      applePay: {
+        cartItems: Array<PlatformPay.CartSummaryItem>;
+        shippingMethods: Array<PlatformPay.ShippingMethod>;
+        errors: Array<PlatformPay.ApplePaySheetError>;
+      };
+    }): Promise<{
+      error?: StripeError<PlatformPayError>;
+    }> => {
+      return updatePlatformPaySheet(params);
+    },
+    []
+  );
+
+  const _openPlatformPaySetup = useCallback(async (): Promise<void> => {
+    return openPlatformPaySetup();
+  }, []);
+
   return {
     retrievePaymentIntent: _retrievePaymentIntent,
     retrieveSetupIntent: _retrieveSetupIntent,
@@ -340,5 +425,19 @@ export function useStripe() {
     canAddCardToWallet: _canAddCardToWallet,
     collectBankAccountToken: _collectBankAccountToken,
     collectFinancialConnectionsAccounts: _collectFinancialConnectionsAccounts,
+    /**
+     * You must call this method when the user logs out from your app. This will ensure that
+     * any persisted authentication state in the PaymentSheet, such as authentication cookies,
+     * is also cleared during logout.
+     */
+    resetPaymentSheetCustomer: _resetPaymentSheetCustomer,
+    isPlatformPaySupported: _isPlatformPaySupported,
+    confirmPlatformPaySetupIntent: _confirmPlatformPaySetupIntent,
+    confirmPlatformPayPayment: _confirmPlatformPayPayment,
+    dismissPlatformPay: _dismissPlatformPay,
+    createPlatformPayPaymentMethod: _createPlatformPayPaymentMethod,
+    createPlatformPayToken: _createPlatformPayToken,
+    updatePlatformPaySheet: _updatePlatformPaySheet,
+    openPlatformPaySetup: _openPlatformPaySetup,
   };
 }

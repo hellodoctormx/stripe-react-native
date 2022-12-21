@@ -22,6 +22,30 @@ const mockFunctions = {
     paymentMethod: {},
     error: null,
   })),
+  isPlatformPaySupported: jest.fn(async () => true),
+  confirmPlatformPaySetupIntent: jest.fn(async () => ({
+    setupIntent: {},
+    error: null,
+  })),
+  confirmPlatformPayPayment: jest.fn(async () => ({
+    paymentIntent: {},
+    error: null,
+  })),
+  dismissPlatformPay: jest.fn(async () => true),
+  createPlatformPayPaymentMethod: jest.fn(async () => ({
+    paymentMethod: {},
+    error: null,
+  })),
+  createPlatformPayToken: jest.fn(async () => ({
+    token: {},
+    error: null,
+  })),
+  updatePlatformPaySheet: jest.fn(async () => ({
+    error: null,
+  })),
+  openPlatformPaySetup: jest.fn(async () => {
+    return;
+  }),
   isApplePaySupported: jest.fn(async () => true),
   presentApplePay: jest.fn(async () => ({
     error: null,
@@ -60,6 +84,7 @@ const mockFunctions = {
   confirmPaymentSheetPayment: jest.fn(async () => ({
     error: null,
   })),
+  resetPaymentSheetCustomer: jest.fn(async () => null),
   initGooglePay: jest.fn(async () => ({
     error: null,
   })),
@@ -140,6 +165,31 @@ const mockHooks = {
       ...mockFunctions.openApplePaySetup(),
     })),
   })),
+  usePlatformPay: jest.fn(() => ({
+    loading: false,
+    isPlatformPaySupported: true,
+    confirmPlatformPaySetupIntent: jest.fn(async () => ({
+      ...mockFunctions.confirmPlatformPaySetupIntent(),
+    })),
+    confirmPlatformPayPayment: jest.fn(async () => ({
+      ...mockFunctions.confirmPlatformPayPayment(),
+    })),
+    dismissPlatformPay: jest.fn(async () => ({
+      ...mockFunctions.dismissPlatformPay(),
+    })),
+    createPlatformPayPaymentMethod: jest.fn(async () => ({
+      ...mockFunctions.createPlatformPayPaymentMethod(),
+    })),
+    createPlatformPayToken: jest.fn(async () => ({
+      ...mockFunctions.createPlatformPayToken(),
+    })),
+    updatePlatformPaySheet: jest.fn(async () => ({
+      ...mockFunctions.updatePlatformPaySheet(),
+    })),
+    openPlatformPaySetup: jest.fn(async () => ({
+      ...mockFunctions.openPlatformPaySetup(),
+    })),
+  })),
   usePaymentSheet: jest.fn(() => ({
     loading: false,
     initPaymentSheet: jest.fn(async () => ({
@@ -174,5 +224,6 @@ module.exports = {
   AuBECSDebitForm: () => 'AuBECSDebitForm',
   GooglePayButton: () => 'GooglePayButton',
   AddToWalletButton: () => 'AddToWalletButton',
+  PlatformPayButton: () => 'PlatformPayButton',
   useStripe: jest.fn(() => mockHooks),
 };

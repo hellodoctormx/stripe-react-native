@@ -71,54 +71,6 @@ class BasicPaymentScreen {
     });
     expect(alert.getText()).toEqual(status);
   }
-
-  authorizeACH() {
-    driver.pause(5000);
-    const webviewContexts = getAllWebviewContexts();
-    for (const context of webviewContexts) {
-      try {
-        driver.switchContext(context);
-        let button = $(`button*=Manually verify instead`);
-        if (button.isDisplayed()) {
-          button.click();
-          driver.pause(2000);
-
-          button = $(`span=Confirm account number`);
-          button.click();
-          button.sendKeys(['000123456789']);
-          driver.pause(2000);
-
-          button = $(`span=Account number`);
-          button.click();
-          button.pressKeyCode;
-          button.sendKeys(['000123456789']);
-          driver.pause(2000);
-
-          button = $(`span=Routing number`);
-          button.click();
-          button.sendKeys(['110000000']);
-          driver.pause(2000);
-
-          button = $(`span=Account number`);
-          button.click();
-
-          button = $(`button*=Continue`);
-          button.click();
-          driver.pause(2000);
-
-          button = $(`//button[@data-testid='done-button']`);
-          button.click();
-          break;
-        }
-      } catch (e) {
-        console.log(
-          `Unable to switch to ${context} context. This context may no longer exist.`
-        );
-      }
-    }
-    driver.switchContext(getNativeContext());
-    driver.pause(5000);
-  }
 }
 
 export function getAllWebviewContexts(): string[] {
@@ -132,9 +84,6 @@ export function getAllWebviewContexts(): string[] {
   const webviewContext = allContexts.filter((contextName) =>
     contextName.toLowerCase().includes('webview')
   );
-  if (!webviewContext.length) {
-    throw new Error('No webview context was found.');
-  }
 
   return webviewContext.sort((a, b) => {
     if (a.includes('stripe') && !b.includes('stripe')) {

@@ -4,7 +4,7 @@ buildscript {
 
   repositories {
     google()
-    jcenter()
+    mavenCentral()
   }
 
   dependencies {
@@ -35,6 +35,7 @@ android {
     versionName "1.0"
     vectorDrawables.useSupportLibrary = true
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    consumerProguardFiles 'proguard-rules.txt'
   }
 
   buildTypes {
@@ -57,7 +58,6 @@ android {
 
 repositories {
   mavenCentral()
-  jcenter()
   google()
 
   def found = false
