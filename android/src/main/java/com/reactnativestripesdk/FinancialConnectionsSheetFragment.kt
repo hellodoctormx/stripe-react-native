@@ -233,6 +233,7 @@ class FinancialConnectionsSheetFragment : Fragment() {
 
     private fun mapFromPermission(permission: FinancialConnectionsAccount.Permissions): String {
       return when (permission) {
+        FinancialConnectionsAccount.Permissions.ACCOUNT_NUMBERS -> "accountNumbers"
         FinancialConnectionsAccount.Permissions.PAYMENT_METHOD -> "paymentMethod"
         FinancialConnectionsAccount.Permissions.BALANCES -> "balances"
         FinancialConnectionsAccount.Permissions.OWNERSHIP -> "ownership"

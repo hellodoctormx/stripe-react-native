@@ -254,13 +254,14 @@ class PaymentLauncherFragment(
    */
   private fun isNextActionSuccessState(nextAction: StripeIntent.NextActionType?): Boolean {
     return when (nextAction) {
-      StripeIntent.NextActionType.DisplayOxxoDetails,
       StripeIntent.NextActionType.VerifyWithMicrodeposits -> true
       StripeIntent.NextActionType.RedirectToUrl,
       StripeIntent.NextActionType.UseStripeSdk,
       StripeIntent.NextActionType.AlipayRedirect,
       StripeIntent.NextActionType.BlikAuthorize,
       StripeIntent.NextActionType.WeChatPayRedirect,
+      StripeIntent.NextActionType.DisplayOxxoDetails,
+      StripeIntent.NextActionType.UpiAwaitNotification,
       null -> false
     }
   }
