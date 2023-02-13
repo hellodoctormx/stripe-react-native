@@ -381,6 +381,7 @@ class Mappers {
             "receiptEmail": paymentIntent.receiptEmail ?? NSNull(),
             "livemode": paymentIntent.livemode,
             "paymentMethodId": paymentIntent.paymentMethodId ?? NSNull(),
+            "paymentMethod": mapFromPaymentMethod(paymentIntent.paymentMethod) ?? NSNull(),
             "captureMethod": mapCaptureMethod(paymentIntent.captureMethod),
             "confirmationMethod": mapConfirmationMethod(paymentIntent.confirmationMethod),
             "created": convertDateToUnixTimestampMilliseconds(date: paymentIntent.created) ?? NSNull(),
@@ -502,19 +503,19 @@ class Mappers {
             return nil
         }
         let billing = STPPaymentMethodBillingDetails()
-        billing.email = RCTConvert.nsString(billingDetails["email"])
-        billing.phone = RCTConvert.nsString(billingDetails["phone"])
-        billing.name = RCTConvert.nsString(billingDetails["name"])
+        billing.email = billingDetails["email"] as? String
+        billing.phone = billingDetails["phone"] as? String
+        billing.name = billingDetails["name"] as? String
 
         let address = STPPaymentMethodAddress()
 
         if let addressMap = billingDetails["address"] as? NSDictionary {
-            address.city = RCTConvert.nsString(addressMap["city"])
-            address.postalCode = RCTConvert.nsString(addressMap["postalCode"])
-            address.country = RCTConvert.nsString(addressMap["country"])
-            address.line1 = RCTConvert.nsString(addressMap["line1"])
-            address.line2 = RCTConvert.nsString(addressMap["line2"])
-            address.state = RCTConvert.nsString(addressMap["state"])
+            address.city = addressMap["city"] as? String
+            address.postalCode = addressMap["postalCode"] as? String
+            address.country = addressMap["country"] as? String
+            address.line1 = addressMap["line1"] as? String
+            address.line2 = addressMap["line2"] as? String
+            address.state = addressMap["state"] as? String
         }
 
         billing.address = address
@@ -718,6 +719,7 @@ class Mappers {
             "paymentMethodTypes": NSArray(),
             "usage": mapFromSetupIntentUsage(usage: setupIntent.usage),
             "paymentMethodId": setupIntent.paymentMethodID ?? NSNull(),
+            "paymentMethod": mapFromPaymentMethod(setupIntent.paymentMethod) ?? NSNull(),
             "created": NSNull(),
             "lastSetupError": NSNull(),
             "nextAction": mapNextAction(nextAction: setupIntent.nextAction) ?? NSNull(),
